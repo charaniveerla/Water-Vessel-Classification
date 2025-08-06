@@ -1,46 +1,65 @@
 
 # 🚢 Iv3-Xc: Hybrid Deep Learning Model for Water Vessel Classification
 
-A hybrid deep learning approach that integrates **InceptionV3** and **Xception** architectures to accurately classify water vessels. Designed for marine safety, defense, and naval surveillance, this ensemble model leverages transfer learning to achieve **93.04% accuracy** on the Analytics Vidhya dataset.
+This project presents a **two-phase approach** to water vessel classification using state-of-the-art deep learning techniques.
 
 ---
 
 ## 📌 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
+- [Project Overview](#project-overview)
+- [Phase 1: Transfer Learning Model Evaluation](#phase-1-transfer-learning-model-evaluation)
+- [Phase 2: Hybrid Iv3-Xc Ensemble Model](#phase-2-hybrid-iv3-xc-ensemble-model)
 - [Dataset](#dataset)
-- [Model Architecture](#model-architecture)
+- [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Evaluation Metrics](#evaluation-metrics)
 - [Results](#results)
 - [Future Work](#future-work)
 - [Credits](#credits)
+- [License](#license)
 
 ---
 
-## 🧠 Overview
+## 📖 Project Overview
 
-This project proposes a **transfer learning-based ensemble classification model (Iv3-Xc)** by combining InceptionV3 and Xception architectures. The hybrid model efficiently classifies water vessels into five categories:
+This project targets the classification of marine water vessels (Cargo, Military, Carrier, Cruise, Tanker) using deep learning, with applications in **maritime security, naval defense**, and **coastal surveillance**.
 
-- Cargo
-- Military
-- Carrier
-- Cruise
-- Tanker
-
-The aim is to improve classification accuracy, reduce overfitting, and handle vanishing gradient issues prevalent in traditional CNNs.
+We began by experimenting with **five pre-trained transfer learning models**, then proceeded to create a hybrid ensemble model combining the two best performers — **InceptionV3** and **Xception** — into the final `Iv3-Xc` architecture.
 
 ---
 
-## ✨ Features
+## 🔍 Phase 1: Transfer Learning Model Evaluation
 
-- Transfer Learning using **InceptionV3** and **Xception**
-- **Ensemble Fusion** using `GlobalMaxPooling` and `Concatenate` layers
-- Advanced data augmentation for robustness
-- High accuracy with reduced training cost
-- Evaluation with precision, recall, F1-score, and confusion matrix
+We fine-tuned and tested the following models on a labeled dataset from Analytics Vidhya:
+
+- VGG16
+- ResNet50
+- EfficientNetB0
+- InceptionV3
+- Xception
+
+After evaluating performance based on Accuracy, Precision, Recall, and F1-Score, the **top two models** identified were:
+
+✅ InceptionV3  
+✅ Xception
+
+---
+
+## 🚀 Phase 2: Hybrid Iv3-Xc Ensemble Model
+
+### Key Design:
+- Combined **InceptionV3** and **Xception** using a concatenated architecture
+- Integrated custom top layers using `GlobalMaxPooling2D` and `Dense` layers
+- Final classifier: `Dense(5, softmax)` for multi-class output
+
+### Training Details:
+- Image Input Size: `150x150x3`
+- Epochs: 30
+- Batch Size: 32
+- Optimizer: Nadam
+- Loss Function: Categorical Crossentropy
 
 ---
 
@@ -49,58 +68,47 @@ The aim is to improve classification accuracy, reduce overfitting, and handle va
 - Source: [Analytics Vidhya – Game of Deep Learning](https://datahack.analyticsvidhya.com/contest/game-of-deep-learning/)
 - Total Images: **6,252**
 - Classes: Cargo, Military, Carrier, Cruise, Tanker
-- Format: JPEG/PNG images resized to `150x150x3`
+- Format: JPEG/PNG, resized to `150x150`
 
 ---
 
-## 🏗️ Model Architecture
+## ✨ Features
 
-> **Iv3-Xc (InceptionV3 + Xception Ensemble)**
-
-1. **Input Layer**: `150x150x3`
-2. **InceptionV3** + **Xception** base models (frozen)
-3. `GlobalMaxPooling2D` + `Dense(128, relu)` for each
-4. `Concatenate` layers
-5. `Dense(5, softmax)` for output classification
-
-> Optimizer: **Nadam**  
-> Loss: **Categorical Crossentropy**  
-> Epochs: **30**  
-> Batch Size: **32**
+- ✅ Transfer learning with five CNNs
+- ✅ Final hybrid ensemble: Iv3-Xc
+- ✅ Data Augmentation using `ImageDataGenerator`
+- ✅ Confusion Matrix & Classification Report
+- ✅ Notebook-based reproducibility
 
 ---
 
 ## 🛠 Installation
 
-1. Clone the repo:
-   ```bash
-   git clone https://github.com/yourusername/iv3-xc-vessel-classifier.git
-   cd iv3-xc-vessel-classifier
-   ```
+```bash
+git clone https://github.com/yourusername/iv3-xc-vessel-classifier.git
+cd iv3-xc-vessel-classifier
+pip install -r requirements.txt
+```
 
-2. Install required packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
+Organize your dataset like:
 
-3. Download the dataset and organize it:
-   ```
-   └── dataset/
-       ├── train/
-       ├── test/
-       └── validation/
-   ```
+```
+dataset/
+├── train/
+├── test/
+└── validation/
+```
 
 ---
 
 ## ▶️ Usage
 
-Open the notebooks in order:
+Open the following notebooks in sequence:
 
-1. `Ensemble Iv3Xc Model.ipynb` – model creation, training, and saving weights  
-2. `EvaluationMetrics.ipynb` – test predictions, confusion matrix, precision, recall, F1 score
+1. `Ensemble Iv3Xc Model.ipynb` – model definition, training, and saving weights
+2. `EvaluationMetrics.ipynb` – test predictions, confusion matrix, and performance evaluation
 
-To classify a new image:
+Example inference code:
 ```python
 from tensorflow.keras.models import load_model
 from PIL import Image
@@ -110,29 +118,13 @@ model = load_model('iv3_xc_model.h5')
 image = Image.open("sample.jpg").resize((150, 150))
 image = np.array(image) / 255.0
 image = image.reshape(1, 150, 150, 3)
-
-prediction = model.predict(image)
-predicted_class = np.argmax(prediction)
-print(predicted_class)
+pred = model.predict(image)
+print("Predicted Class:", np.argmax(pred))
 ```
 
 ---
 
 ## 📊 Evaluation Metrics
-
-| Metric      | Value     |
-|-------------|-----------|
-| Accuracy    | 93.04%    |
-| Precision   | 94%       |
-| Recall      | 93%       |
-| F1-Score    | 93%       |
-
----
-
-## 📈 Results
-
-- Confusion matrix and classification report included in the notebook
-- Iv3-Xc outperformed other models:
 
 | Model          | Accuracy |
 |----------------|----------|
@@ -141,32 +133,43 @@ print(predicted_class)
 | EfficientNetB0 | 90.22%   |
 | InceptionV3    | 91.00%   |
 | Xception       | 92.00%   |
-| **Iv3-Xc**     | **93.04%**   |
+| **Iv3-Xc**     | **93.04%** |
+
+Additional Metrics for Iv3-Xc:
+- Precision: 94%
+- Recall: 93%
+- F1-Score: 93%
+
+---
+
+## 📈 Results
+
+- The hybrid Iv3-Xc model **outperformed all standalone models**
+- Confusion matrix and classification report included in the notebook
+- Visual plots for training and validation accuracy/loss tracked over 30 epochs
 
 ---
 
 ## 🔮 Future Work
 
-- Incorporate **acoustic sound classification** for ships using radiated noise
-- Improve classification under occlusion (e.g., fog)
-- Real-time classification pipeline for marine surveillance systems
+- Integrate **acoustic signal-based classification** using radiated marine vessel noise
+- Improve classification under low-visibility conditions (fog, night)
+- Real-time deployment for coastal monitoring systems
 
 ---
 
 ## 👥 Credits
 
-**Authors:**
+**Contributors:**
 
 - Charani Sri Veerla – `charaniveerla@gmail.com`
 - Twinkle Mounami Budithi – `twinklemounami@gmail.com`
-- Srinivas Kudipudi – Professor, VRSEC
-
-Affiliation: Department of Computer Science Engineering, VR Siddhartha Engineering College
+- Dr. Srinivas Kudipudi – Professor, VR Siddhartha Engineering College
 
 ---
 
 ## 📄 License
 
-This project is for academic and research purposes only. Contact the authors for permission if you intend to use it commercially.
+This project is intended for **academic and research purposes** only. Contact the authors for any commercial use or redistribution.
 
 ---
